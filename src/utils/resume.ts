@@ -1,0 +1,3 @@
+const skills=['data structures','algorithms','python','java','c++','react','sql','dbms','cloud','git','system design','machine learning','docker','problem solving','javascript','typescript','linux','networks','operating systems','node.js','html','css','matlab','iot','verilog'];
+function contains(text:string,phrase:string){const escaped=phrase.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');return new RegExp(`(?<![a-z0-9_])${escaped}(?![a-z0-9_])`,'i').test(text);}
+export function keywordMatch(resume:string,job:string){const required=skills.filter(s=>contains(job,s));const matched=required.filter(s=>contains(resume,s)),missing=required.filter(s=>!contains(resume,s));return {matched,missing,score:required.length?Math.round(matched.length/required.length*100):null};}

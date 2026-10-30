@@ -1,0 +1,8 @@
+{
+  "name": "Campus Connect AI",
+  "description": "College career portal with administrator-reviewed enrollment, persistent opportunity and application tracking, and optional server-side AI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

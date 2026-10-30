@@ -1,0 +1,2 @@
+import { defineConfig } from '@playwright/test';
+export default defineConfig({testDir:'./tests',testMatch:'*.spec.ts',workers:1,use:{baseURL:'http://127.0.0.1:4173',headless:true, launchOptions: process.env.PLAYWRIGHT_EXECUTABLE_PATH ? {executablePath:process.env.PLAYWRIGHT_EXECUTABLE_PATH,args:['--no-sandbox','--disable-dev-shm-usage','--no-zygote']} : undefined},webServer:{command:'node --import tsx tests/ui-server.ts',url:'http://127.0.0.1:4173/api/config',reuseExistingServer:false,timeout:30000},reporter:'list'});
