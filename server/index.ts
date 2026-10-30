@@ -12,8 +12,10 @@ async function start() {
   console.log('[DB] Connected to MongoDB:', MONGODB_URI.replace(/:\/\/.+@/, '://***@'));
 
   const { app } = createApp();
-  const port    = Number(process.env.PORT || 3001);
-  const host    = process.env.HOST || '0.0.0.0'; // 0.0.0.0 is required for Render/cloud deployments
+  // IMPORTANT: Must bind to 0.0.0.0 on Render (not 127.0.0.1)
+  // PORT is injected by Render automatically (usually 10000)
+  const port = Number(process.env.PORT) || 10000;
+  const host = '0.0.0.0';
 
   app.listen(port, host, () =>
     console.log(`Campus Connect API (MongoDB) listening on http://${host}:${port}`),
