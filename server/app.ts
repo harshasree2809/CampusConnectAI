@@ -11,7 +11,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { GoogleGenAI } from '@google/genai';
-import { INITIAL_OPPORTUNITIES, INITIAL_DRIVE_EVENTS } from '../src/data/mockData';
+import { INITIAL_OPPORTUNITIES, INITIAL_DRIVE_EVENTS } from './seedData';
 import {
   User, Opportunity, Application, DriveEvent,
   Kyc, Upload, Bookmark, Notification, Otp, Meta,
