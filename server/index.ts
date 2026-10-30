@@ -1,19 +1,19 @@
 import 'dotenv/config';
 import mongoose from 'mongoose';
-import { createApp } from './app.js';
+import { createApp } from './app';
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/campusconnect';
 
 async function start() {
   console.log('[DB] Connecting to MongoDB...');
   await mongoose.connect(MONGODB_URI, {
-    serverSelectionTimeoutMS: 10000, // 10 s timeout
+    serverSelectionTimeoutMS: 15000,
   });
-  console.log('[DB] Connected to MongoDB:', MONGODB_URI.replace(/:\/\/.+@/, '://***@')); // hide password in logs
+  console.log('[DB] Connected to MongoDB:', MONGODB_URI.replace(/:\/\/.+@/, '://***@'));
 
   const { app } = createApp();
   const port    = Number(process.env.PORT || 3001);
-  const host    = process.env.HOST || '127.0.0.1';
+  const host    = process.env.HOST || '0.0.0.0'; // 0.0.0.0 is required for Render/cloud deployments
 
   app.listen(port, host, () =>
     console.log(`Campus Connect API (MongoDB) listening on http://${host}:${port}`),

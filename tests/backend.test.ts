@@ -1,11 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import mongoose from 'mongoose';
-import { createApp } from '../server/app.js';
-import { User, Opportunity, Otp, Bookmark } from '../server/models/index.js';
-import { csv, calendar } from '../src/utils/exports.js';
-import { keywordMatch } from '../src/utils/resume.js';
-import { getDeadlineInfo } from '../src/utils/dateUtils.js';
+import { createApp } from '../server/app';
+import { User, Opportunity, Otp, Bookmark } from '../server/models/index';
+import { csv, calendar } from '../src/utils/exports';
+import { keywordMatch } from '../src/utils/resume';
+import { getDeadlineInfo } from '../src/utils/dateUtils';
 
 // Use a dedicated test database so we never pollute production data
 const TEST_DB = 'mongodb://127.0.0.1:27017/campusconnect_backend_test';

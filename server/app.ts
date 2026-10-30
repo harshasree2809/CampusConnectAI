@@ -11,11 +11,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { GoogleGenAI } from '@google/genai';
-import { INITIAL_OPPORTUNITIES, INITIAL_DRIVE_EVENTS } from '../src/data/mockData.js';
+import { INITIAL_OPPORTUNITIES, INITIAL_DRIVE_EVENTS } from '../src/data/mockData';
 import {
   User, Opportunity, Application, DriveEvent,
   Kyc, Upload, Bookmark, Notification, Otp, Meta,
-} from './models/index.js';
+} from './models/index';
 
 const require = createRequire(import.meta.url);
 const pdfParse = require('pdf-parse');

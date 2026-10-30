@@ -1,7 +1,7 @@
 // Isolated browser-test server. Credentials here never seed a normal app instance.
 import mongoose from 'mongoose';
-import { createApp, passwordHash } from '../server/app.js';
-import { User, Opportunity } from '../server/models/index.js';
+import { createApp, passwordHash } from '../server/app';
+import { User, Opportunity } from '../server/models/index';
 
 process.env.ADMIN_EMAIL    = 'browser-admin@test.invalid';
 process.env.ADMIN_PASSWORD = 'Browser-admin-test-1234';
