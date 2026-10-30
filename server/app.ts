@@ -72,12 +72,14 @@ export function createApp(options: {
   seed?: boolean;
 } = {}) {
   const app = express();
+  app.set('trust proxy', 1);
   app.disable('x-powered-by');
   app.use(helmet({ contentSecurityPolicy: false }));
   app.use(express.json({ limit: '150kb' }));
 
   // ── Session (stored in MongoDB via connect-mongo) ───────────────────────────
   const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/campusconnect';
+  const isCrossSite = process.env.COOKIE_SAME_SITE === 'none' || (process.env.NODE_ENV === 'production' && !!process.env.APP_URL);
   app.use(session({
     secret: process.env.SESSION_SECRET || randomBytes(32).toString('hex'),
     resave: false,
@@ -85,33 +87,41 @@ export function createApp(options: {
     store: MongoStore.create({ mongoUrl: mongoUri, collectionName: 'sessions', ttl: 7 * 24 * 3600 }),
     cookie: {
       httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
+      sameSite: isCrossSite ? 'none' : 'lax',
+      secure: isCrossSite || process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 3600 * 1000,
     },
   }));
 
-  // ── Global API middleware ───────────────────────────────────────────────────
-  app.use('/api', (_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next(); });
+  // ── Global API & CORS middleware ───────────────────────────────────────────
+  app.use('/api', (req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store');
 
-  // CSRF-lite: reject cross-origin mutating requests
-  app.use('/api', (req, _res, next) => {
-    if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method) && req.headers.origin) {
-      const origin    = process.env.APP_URL || 'http://localhost:3000';
-      const reqOrigin = req.headers.origin;
-      let allowed     = reqOrigin === new URL(origin).origin;
-      if (!allowed && process.env.NODE_ENV !== 'production') {
-        try {
-          const h = new URL(reqOrigin).hostname;
-          if (
-            h === 'localhost' || h === '127.0.0.1' ||
-            /^192\.168\.\d+\.\d+$/.test(h) ||
-            /^10\.\d+\.\d+\.\d+$/.test(h) ||
-            /^172\.(1[6-9]|2\d|3[01])\.\d+\.\d+$/.test(h)
-          ) allowed = true;
-        } catch {}
+    const origin = req.headers.origin;
+    if (origin) {
+      const allowedConfig = [
+        process.env.APP_URL || 'http://localhost:3000',
+        ...(process.env.ADDITIONAL_ALLOWED_ORIGINS ? process.env.ADDITIONAL_ALLOWED_ORIGINS.split(',') : [])
+      ].map(u => {
+        try { return new URL(u.trim()).origin; } catch { return u.trim(); }
+      });
+
+      const isAllowed = allowedConfig.includes(origin) ||
+        origin.endsWith('.vercel.app') ||
+        (process.env.NODE_ENV !== 'production' && (
+          origin.includes('localhost') || origin.includes('127.0.0.1')
+        ));
+
+      if (isAllowed) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
       }
-      if (!allowed) return next(Object.assign(new Error('Untrusted request origin.'), { status: 403 }));
+    }
+
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(200);
     }
     next();
   });
